@@ -13,7 +13,7 @@ const schema = z.object({
       z.object({
         pathname: z.string().regex(/^stories\/[A-Za-z0-9-]+\.[A-Za-z0-9]{1,5}$/),
         type: z.enum(["image", "video"]),
-        duration: z.number().min(0).max(20),
+        duration: z.number().min(0).max(60),
       }),
     )
     .max(4)
