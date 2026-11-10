@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { upload as uploadToBlob } from "@vercel/blob/client"
 import { ArrowLeft, Camera, Plus, X } from "lucide-react"
 import { moods } from "@/lib/moods"
 import { Clip, Sticker } from "@/components/sticker"
@@ -13,6 +14,17 @@ type Pick = { file: File; url: string; duration: number }
 
 const outlineButton = "flex h-11 w-full cursor-pointer items-center justify-center rounded-xl border border-black/80 text-sm font-semibold"
 
+const extensions: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/avif": "avif",
+  "video/mp4": "mp4",
+  "video/webm": "webm",
+  "video/quicktime": "mov",
+}
+
 export function NewMomentWizard({ name, author }: { name: string; author: Author }) {
   const router = useRouter()
   const [items, setItems] = useState<Pick[]>([])
@@ -21,6 +33,7 @@ export function NewMomentWizard({ name, author }: { name: string; author: Author
   const [preview, setPreview] = useState(false)
   const [error, setError] = useState("")
   const [saving, setSaving] = useState(false)
+  const [progress, setProgress] = useState("")
   const [recording, setRecording] = useState(false)
   const [seconds, setSeconds] = useState(0)
   const [cameraOpen, setCameraOpen] = useState(false)
@@ -99,15 +112,33 @@ export function NewMomentWizard({ name, author }: { name: string; author: Author
   }
 
   async function upload() {
-    setSaving(true); setError("")
-    const data = new FormData()
-    data.set("body", caption)
-    if (mood) data.set("mood", mood)
-    items.forEach((item) => { data.append("files", item.file); data.append("durations", String(item.duration)) })
+    setSaving(true)
+    setError("")
+    setProgress("")
     try {
-      const response = await fetch("/api/stories", { method: "POST", body: data })
-      const result = await response.json()
-      if (!response.ok) throw new Error(result.error)
+      const media: Array<{ pathname: string; type: "image" | "video"; duration: number }> = []
+      for (let index = 0; index < items.length; index++) {
+        const item = items[index]
+        const contentType = item.file.type.split(";")[0]
+        const extension = extensions[contentType]
+        if (!extension) throw new Error(`${item.file.name} is not a supported file.`)
+        setProgress(`Uploading ${index + 1} of ${items.length}…`)
+        const blob = await uploadToBlob(`stories/${crypto.randomUUID()}.${extension}`, item.file, {
+          access: "private",
+          handleUploadUrl: "/api/blob-upload",
+          contentType,
+          multipart: item.file.size > 100 * 1024 * 1024,
+        })
+        media.push({ pathname: blob.pathname, type: contentType.startsWith("video/") ? "video" : "image", duration: item.duration })
+      }
+      setProgress("Saving…")
+      const response = await fetch("/api/stories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: caption, mood: mood || undefined, media }),
+      })
+      const result = await response.json().catch(() => null)
+      if (!response.ok) throw new Error(result?.error ?? `Could not save this moment (${response.status}).`)
       router.push("/")
       router.refresh()
     } catch (cause) {
@@ -149,7 +180,7 @@ export function NewMomentWizard({ name, author }: { name: string; author: Author
         {error ? <p className="mb-3 text-sm font-medium text-red-400" role="alert">{error}</p> : null}
         <div className="grid grid-cols-2 gap-3">
           <button type="button" onClick={() => setPreview(false)} className="h-12 rounded-xl border border-white/70 text-[15px] font-semibold">Edit</button>
-          <button type="button" onClick={upload} disabled={saving} className="btn-green h-12 rounded-xl text-[15px] font-bold disabled:opacity-60">{saving ? "Uploading…" : "Upload"}</button>
+          <button type="button" onClick={upload} disabled={saving} className="btn-green h-12 rounded-xl text-[15px] font-bold disabled:opacity-60">{saving ? progress || "Uploading…" : "Upload"}</button>
         </div>
       </section>
     )
@@ -227,7 +258,7 @@ export function NewMomentWizard({ name, author }: { name: string; author: Author
       {error ? <p className="mt-4 text-sm font-medium text-red-400" role="alert">{error}</p> : null}
       <div className="mt-6 grid grid-cols-2 gap-3">
         <button type="button" onClick={() => setPreview(true)} disabled={!canShare} className="h-12 rounded-xl border border-white/70 text-[15px] font-semibold disabled:opacity-40">Preview</button>
-        <button type="button" onClick={upload} disabled={saving || !canShare} className="btn-green h-12 rounded-xl text-[15px] font-bold disabled:opacity-40">{saving ? "Uploading…" : "Upload"}</button>
+        <button type="button" onClick={upload} disabled={saving || !canShare} className="btn-green h-12 rounded-xl text-[15px] font-bold disabled:opacity-40">{saving ? progress || "Uploading…" : "Upload"}</button>
       </div>
     </section>
   )
