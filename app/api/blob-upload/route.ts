@@ -13,7 +13,7 @@ export async function POST(request: Request) {
         if (!/^stories\/[A-Za-z0-9-]+\.[A-Za-z0-9]{1,5}$/.test(pathname)) throw new Error("Invalid file name.")
         return {
           allowedContentTypes: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif", "video/mp4", "video/webm", "video/quicktime"],
-          maximumSizeInBytes: 200 * 1024 * 1024,
+          maximumSizeInBytes: 300 * 1024 * 1024,
           addRandomSuffix: false,
         }
       },
