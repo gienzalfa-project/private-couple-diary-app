@@ -11,11 +11,11 @@ const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 function BinderRing({ className }: { className?: string }) {
   return (
     <>
-      <span aria-hidden="true" className={cn("absolute top-[22px] z-10 h-2.5 w-4 -translate-x-1/2 rounded-full bg-[#0d0d10] shadow-[inset_0_2px_2px_rgba(0,0,0,.9),0_1px_0_rgba(255,255,255,.35)]", className)} />
-      <svg aria-hidden="true" viewBox="0 0 14 52" className={cn("pointer-events-none absolute -top-[14px] z-20 h-[52px] w-3.5 -translate-x-1/2 overflow-visible drop-shadow-[0_3px_2px_rgba(0,0,0,.45)]", className)}>
-        <rect x="2.5" y="2" width="9" height="46" rx="4.5" fill="none" stroke="#6b6e75" strokeWidth="3.6" />
-        <rect x="2.5" y="2" width="9" height="46" rx="4.5" fill="none" stroke="#e9ebef" strokeWidth="1.6" />
-        <rect x="1.9" y="3" width="1" height="40" rx=".5" fill="#ffffff" opacity=".85" />
+      <span aria-hidden="true" className={cn("absolute top-[44px] z-10 h-3 w-[18px] -translate-x-1/2 rounded-full bg-[#0f1a33] shadow-[inset_0_2px_3px_rgba(0,0,0,.9),0_1px_0_rgba(255,255,255,.55)]", className)} />
+      <svg aria-hidden="true" viewBox="0 0 14 66" className={cn("pointer-events-none absolute -top-[14px] z-20 h-[66px] w-3.5 -translate-x-1/2 overflow-visible drop-shadow-[0_3px_2px_rgba(0,0,0,.45)]", className)}>
+        <rect x="2.5" y="2" width="9" height="58" rx="4.5" fill="none" stroke="#6b6e75" strokeWidth="3.6" />
+        <rect x="2.5" y="2" width="9" height="58" rx="4.5" fill="none" stroke="#e9ebef" strokeWidth="1.6" />
+        <rect x="1.9" y="3" width="1" height="50" rx=".5" fill="#ffffff" opacity=".85" />
       </svg>
     </>
   )
@@ -39,11 +39,12 @@ export function StoryCalendar({ storyDates }: { storyDates: string[] }) {
   const shift = (offset: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + offset, 1))
 
   return (
-    <section aria-labelledby="calendar-title" className="relative rounded-[24px] bg-[#4f90f5] px-2 pb-3 pt-7 shadow-[0_16px_32px_-14px_rgba(0,0,0,.7)]">
+    <section aria-labelledby="calendar-title" className="relative rounded-[24px] bg-[#4f90f5] px-2 pb-3 pt-9 shadow-[0_16px_32px_-14px_rgba(0,0,0,.7)]">
       <BinderRing className="left-[26%]" />
       <BinderRing className="right-[26%]" />
       <Sticker name="cat-peek" className="absolute -right-1 -top-9 w-16" />
-      <div className="note note-yellow px-2 pb-3 pt-3">
+      <div aria-hidden="true" className="absolute inset-x-4 bottom-1 h-6 rounded-b-[20px] bg-[#e7cb80]" />
+      <div className="note note-yellow px-2 pb-3 pt-6">
         <div className="mb-2 flex items-center justify-between">
           <button type="button" onClick={() => shift(-1)} aria-label="Previous month" className="flex size-9 items-center justify-center"><ChevronLeft className="size-5" /></button>
           <h2 id="calendar-title" className="whitespace-nowrap font-script text-[34px] leading-none">{new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(month)}</h2>
