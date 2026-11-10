@@ -44,10 +44,14 @@ export function NewMomentWizard({ name, author }: { name: string; author: Author
   const itemsRef = useRef<Pick[]>([])
   itemsRef.current = items
 
-  useEffect(() => () => {
-    itemsRef.current.forEach((item) => URL.revokeObjectURL(item.url))
-    streamRef.current?.getTracks().forEach((track) => track.stop())
-  }, [])
+   useEffect(() => {
+    if (!cameraOpen) return
+    const video = videoRef.current
+    const stream = streamRef.current
+    if (!video || !stream) return
+    video.srcObject = stream
+    video.play().catch(() => {})
+  }, [cameraOpen])
 
   async function addFiles(files: FileList | null) {
     if (!files) return
@@ -62,7 +66,7 @@ export function NewMomentWizard({ name, author }: { name: string; author: Author
           video.onerror = () => resolve(999)
           video.src = url
         })
-        if (duration > 20) { URL.revokeObjectURL(url); setError(`${file.name} is longer than 20 seconds.`); continue }
+        if (duration > 60) { URL.revokeObjectURL(url); setError(`${file.name} is longer than 20 seconds.`); continue }
         next.push({ file, url, duration })
       } else next.push({ file, url: URL.createObjectURL(file), duration: 0 })
     }
@@ -74,8 +78,7 @@ export function NewMomentWizard({ name, author }: { name: string; author: Author
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: true })
       streamRef.current = stream
-      setCameraOpen(true)
-      requestAnimationFrame(() => { if (videoRef.current) { videoRef.current.srcObject = stream; videoRef.current.play() } })
+               setCameraOpen(true)
     } catch { setError("Camera access was not available. Choose a file instead.") }
   }
 
@@ -197,7 +200,7 @@ export function NewMomentWizard({ name, author }: { name: string; author: Author
         <Clip />
         {cameraOpen ? (
           <div className="flex flex-col gap-3">
-            <video ref={videoRef} muted playsInline className="aspect-[3/4] w-full rounded-xl bg-black object-cover" />
+            <video ref={videoRef} autoPlay muted playsInline className="aspect-[3/4] w-full rounded-xl bg-black object-cover" />
             <div className="grid grid-cols-2 gap-2">
               {recording
                 ? <button type="button" onClick={stopRecording} className="h-11 rounded-xl bg-red-600 text-sm font-bold text-white">Stop · {seconds}s</button>
