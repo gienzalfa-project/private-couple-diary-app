@@ -29,8 +29,8 @@ export function StoryCard({ story, viewer, detail = false }: { story: Story; vie
   const mood = moods.find((item) => item.id === story.mood)
   const isFirst = story.author === "a"
   return (
-    <article className={cn("note", isFirst ? "note-green" : "note-pink")}>
-      <span aria-hidden="true" className={cn("absolute -right-2 top-20 -z-10 h-14 w-5 rounded-r-xl", isFirst ? "bg-[#ff9ccb]" : "bg-[#ffe27a]")} />
+   <article className={cn("note", isFirst ? "note-pink" : "note-green")}>
+      <span aria-hidden="true" className={cn("absolute -right-2 top-20 -z-10 h-14 w-5 rounded-r-xl", isFirst ? "bg-[#ffe27a]" : "bg-[#ff9ccb]")} />
       <Clip />
       <Sticker name="star" className="absolute -right-3 -top-4 z-10 w-8 rotate-12" />
       <div className="mb-3 flex items-start gap-2 pl-1">
