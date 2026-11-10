@@ -6,24 +6,42 @@ import { AppHeader } from "@/components/app-header"
 import { Clip } from "@/components/sticker"
 import { StoryCalendar } from "@/components/story-calendar"
 
-const dateKey = (date: Date) => date.toISOString().slice(0, 10)
+const dayFormat = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit" })
+const dateKey = (date: Date) => dayFormat.format(date)
+const pretty = (key: string) => new Intl.DateTimeFormat("en", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${key}T12:00:00Z`))
 
-export default async function CalendarPage() {
+export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
   const session = await getSession()
   if (!session) redirect("/login")
+  const { date: picked } = await searchParams
+  const selected = picked && /^\d{4}-\d{2}-\d{2}$/.test(picked) ? picked : null
   const stories = await getStories()
-  const groups = Object.entries(Object.groupBy(stories, (story) => dateKey(story.createdAt)))
+  const allGroups = Object.entries(Object.groupBy(stories, (story) => dateKey(story.createdAt)))
+  const groups = selected ? allGroups.filter(([date]) => date === selected) : allGroups
   return (
     <>
       <AppHeader session={session} active="calendar" />
       <main className="px-4 pb-16 pt-6">
-        <StoryCalendar storyDates={stories.map((story) => dateKey(story.createdAt))} />
-        <div className="mt-8 flex flex-col gap-7">
+        <StoryCalendar storyDates={stories.map((story) => dateKey(story.createdAt))} selected={selected} />
+        {selected && (
+          <div className="mt-6 flex items-center justify-between px-1 text-sm">
+            <span className="font-medium">Showing {pretty(selected)}</span>
+            <Link href="/calendar" scroll={false} className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium">Show all</Link>
+          </div>
+        )}
+        <div className="mt-6 flex flex-col gap-7">
+          {selected && groups.length === 0 && (
+            <section className="note note-pink">
+              <Clip />
+              <h2 className="mb-1 font-script text-4xl leading-none">{pretty(selected)}</h2>
+              <p className="text-sm">No moments on this day.</p>
+            </section>
+          )}
           {groups.map(([date, items = []]) => (
             <section key={date} id={`day-${date}`} className="note note-pink scroll-mt-4">
               <Clip />
               <div className="mb-3 flex items-baseline justify-between">
-                <h2 className="font-script text-4xl leading-none">{new Intl.DateTimeFormat("en", { day: "numeric", month: "long" }).format(new Date(`${date}T12:00:00`))}</h2>
+                <h2 className="font-script text-4xl leading-none">{pretty(date)}</h2>
                 <span className="text-[11px] font-medium uppercase tracking-wide">{items.length} {items.length === 1 ? "moment" : "moments"}</span>
               </div>
               <ul className="flex flex-col gap-3">
