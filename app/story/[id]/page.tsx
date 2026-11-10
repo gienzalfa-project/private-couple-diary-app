@@ -2,11 +2,13 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { ArrowLeft, Send } from "lucide-react"
 import { addReply } from "@/app/actions/stories"
+import { deleteStory } from "@/app/actions/delete-story"
 import { displayName, getSession, type Author } from "@/lib/auth"
 import { getStory } from "@/lib/stories"
 import { AppHeader } from "@/components/app-header"
 import { Clip } from "@/components/sticker"
 import { StoryCard } from "@/components/story-card"
+import { DeleteStoryButton } from "@/components/delete-story-button"
 
 export default async function StoryPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getSession()
@@ -39,6 +41,11 @@ export default async function StoryPage({ params }: { params: Promise<{ id: stri
             <input id="body" name="body" maxLength={1000} required autoComplete="off" placeholder="Write a reply…" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-black/60" />
             <button type="submit" aria-label="Send reply" className="flex size-9 items-center justify-center"><Send className="size-4" /></button>
           </form>
+          {story.author === session.author && (
+            <div className="mt-4 flex justify-end">
+              <DeleteStoryButton action={deleteStory.bind(null, id)} />
+            </div>
+          )}
         </section>
       </main>
     </>
