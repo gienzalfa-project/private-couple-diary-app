@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next"
-import { Fredoka, Euphoria_Script } from "next/font/google"
+import { Poppins } from "next/font/google"
+import localFont from "next/font/local"
 import { Analytics } from "@vercel/analytics/next"
 import { ServiceWorkerRegistration } from "@/components/service-worker-registration"
 import "./globals.css"
 
-const rounded = Fredoka({ subsets: ["latin"], variable: "--font-sans" })
-const script = Euphoria_Script({ subsets: ["latin"], weight: "400", variable: "--font-script" })
+const rounded = Poppins({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-sans" })
+const script = localFont({ src: "./fonts/Angelface.otf", variable: "--font-script", display: "swap" })
 
 export const metadata: Metadata = {
   title: { default: "yap yap!", template: "%s · yap yap!" },
