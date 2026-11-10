@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Sticker } from "@/components/sticker"
@@ -30,8 +31,9 @@ function BinderRing({ className }: { className?: string }) {
   )
 }
 
-export function StoryCalendar({ storyDates }: { storyDates: string[] }) {
-  const initial = storyDates[0] ? new Date(`${storyDates[0]}T12:00:00`) : new Date()
+export function StoryCalendar({ storyDates, selected = null }: { storyDates: string[]; selected?: string | null }) {
+  const start = selected ?? storyDates[0]
+  const initial = start ? new Date(`${start}T12:00:00`) : new Date()
   const [month, setMonth] = useState(new Date(initial.getFullYear(), initial.getMonth(), 1))
   const [today, setToday] = useState("")
   useEffect(() => {
@@ -68,15 +70,20 @@ export function StoryCalendar({ storyDates }: { storyDates: string[] }) {
             const date = dateKey(month.getFullYear(), month.getMonth(), day)
             const has = dates.has(date)
             const isToday = date === today
-            const content = (
-              <>
-                <span className={cn("flex size-7 items-center justify-center rounded-full text-[13px]", isToday && "bg-[#ff5fa2] font-bold text-white")}>{day}</span>
+            const isSelected = date === selected
+            return (
+              <Link
+                key={date}
+                href={isSelected ? "/calendar" : `/calendar?date=${date}`}
+                scroll={false}
+                aria-current={isSelected ? "date" : undefined}
+                aria-label={has ? `${day}, has moments` : `${day}, no moments`}
+                className="flex flex-col items-center py-0.5"
+              >
+                <span className={cn("flex size-7 items-center justify-center rounded-full text-[13px]", isToday && "bg-[#ff5fa2] font-bold text-white", isSelected && "ring-2 ring-[#17171a]")}>{day}</span>
                 <span className={cn("mt-0.5 size-1 rounded-full", has ? "bg-black" : "bg-transparent")} aria-hidden="true" />
-              </>
+              </Link>
             )
-            return has
-              ? <a key={date} href={`#day-${date}`} aria-label={`${day}, has moments`} className="flex flex-col items-center py-0.5">{content}</a>
-              : <span key={date} className="flex flex-col items-center py-0.5">{content}</span>
           })}
         </div>
         <Sticker name="star" className="absolute -bottom-3 -right-2 w-7" />
