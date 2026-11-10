@@ -11,19 +11,20 @@ const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 function BinderRing({ className }: { className?: string }) {
   return (
     <>
-      <span aria-hidden="true" className={cn("absolute top-[46px] z-10 h-3.5 w-6 -translate-x-1/2 rounded-full bg-[#0b1224] shadow-[inset_0_3px_4px_rgba(0,0,0,.95),0_1px_0_rgba(255,255,255,.5)]", className)} />
-      <svg aria-hidden="true" viewBox="0 0 20 70" className={cn("pointer-events-none absolute -top-[16px] z-20 h-[70px] w-5 -translate-x-1/2 overflow-visible drop-shadow-[0_3px_3px_rgba(0,0,0,.5)]", className)}>
+      <span aria-hidden="true" className={cn("absolute top-[46px] z-10 h-3.5 w-7 -translate-x-1/2 rounded-full bg-[#0b1224] shadow-[inset_0_3px_4px_rgba(0,0,0,.95),0_1px_0_rgba(255,255,255,.5)]", className)} />
+      <svg aria-hidden="true" viewBox="0 0 22 69" className={cn("pointer-events-none absolute -top-[16px] z-20 h-[69px] w-[22px] -translate-x-1/2 overflow-visible drop-shadow-[0_3px_3px_rgba(0,0,0,.5)]", className)}>
         <defs>
           <linearGradient id="ring-metal" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stopColor="#8e9199" />
-            <stop offset=".35" stopColor="#f7f8fa" />
-            <stop offset=".65" stopColor="#b4b7bf" />
-            <stop offset="1" stopColor="#6c6f77" />
+            <stop offset="0" stopColor="#7d8087" />
+            <stop offset=".3" stopColor="#f8f9fb" />
+            <stop offset=".6" stopColor="#b7bac2" />
+            <stop offset="1" stopColor="#5f626a" />
           </linearGradient>
         </defs>
-        <rect x="3" y="3" width="14" height="62" rx="7" fill="none" stroke="#4d5056" strokeWidth="5.6" />
-        <rect x="3" y="3" width="14" height="62" rx="7" fill="none" stroke="url(#ring-metal)" strokeWidth="4" />
-        <path d="M3.5 12 V52" stroke="#ffffff" strokeOpacity=".8" strokeWidth="1" strokeLinecap="round" />
+        <path d="M1 11a10 10 0 0 1 20 0V69H1Z" fill="url(#ring-metal)" />
+        <path d="M8 12a3 3 0 0 1 6 0V69H8Z" fill="#202228" />
+        <path d="M3.6 12V60" stroke="#ffffff" strokeOpacity=".8" strokeWidth="1.2" strokeLinecap="round" />
+        <path d="M18.6 14V60" stroke="#3b3e45" strokeOpacity=".6" strokeWidth="1" strokeLinecap="round" />
       </svg>
     </>
   )
