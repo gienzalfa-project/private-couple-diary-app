@@ -6,7 +6,7 @@ import { ServiceWorkerRegistration } from "@/components/service-worker-registrat
 import "./globals.css"
 
 const rounded = Poppins({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-sans" })
-const script = localFont({ src: "./fonts/Angelface.otf", variable: "--font-script", display: "swap" })
+const script = localFont({ src: "./Angelface.otf", variable: "--font-script", display: "swap" })
 
 export const metadata: Metadata = {
   title: { default: "yap yap!", template: "%s · yap yap!" },
