@@ -4,6 +4,7 @@ import { displayName, type Author } from "@/lib/auth"
 import { moods } from "@/lib/moods"
 import { ReactionBar } from "@/components/reaction-bar"
 import { Clip, Sticker } from "@/components/sticker"
+import { ZoomableMedia } from "@/components/zoomable-media"
 import { cn } from "@/lib/utils"
 
 type Story = {
@@ -18,7 +19,7 @@ type Story = {
 }
 
 const formatDate = (date: Date) => {
-  const parts = new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric" }).formatToParts(date)
+  const parts = new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Jakarta" }).formatToParts(date)
   const pick = (type: string) => parts.find((part) => part.type === type)?.value ?? ""
   return `${pick("day")} ${pick("month")} ${pick("year")}`
 }
@@ -43,12 +44,15 @@ export function StoryCard({ story, viewer, detail = false }: { story: Story; vie
       </div>
       {story.media.length ? (
         <div className={cn("mb-3 grid gap-1.5 overflow-hidden rounded-2xl", story.media.length > 1 && "grid-cols-2")}>
-          {story.media.map((media) => {
-            const src = `/api/media?path=${encodeURIComponent(media.blobPath)}`
-            return media.type === "video"
-              ? <video key={media.id} controls playsInline preload="metadata" className="aspect-[4/3] size-full bg-black object-cover" src={src} />
-              : <img key={media.id} className="aspect-[4/3] size-full object-cover" src={src} alt={`Photo shared by ${name}`} />
-          })}
+          {story.media.map((media) => (
+            <ZoomableMedia
+              key={media.id}
+              type={media.type === "video" ? "video" : "image"}
+              src={`/api/media?path=${encodeURIComponent(media.blobPath)}`}
+              alt={`Photo shared by ${name}`}
+              className="aspect-[4/3] size-full bg-black object-cover"
+            />
+          ))}
         </div>
       ) : null}
       {story.body ? <p className="mb-3 whitespace-pre-wrap text-[15px] leading-snug">{story.body}</p> : null}
